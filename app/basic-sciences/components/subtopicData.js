@@ -7,6 +7,14 @@ const defaultImages = [
   "/logo_nobackground.png",
 ];
 
+export function slugifySegment(text = "") {
+  return text
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function chapter(id, title, desc, icon, bgImage, href = "#") {
   return { id, title, desc, icon, bgImage, href };
 }

@@ -20,6 +20,7 @@ export default async function BasicScienceSubtopicPage({ params }) {
       title={content.title}
       subtitle={content.subtitle}
       chapters={content.chapters}
+      subtopic={subtopic}
     />
   );
 }

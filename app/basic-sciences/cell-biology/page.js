@@ -8,6 +8,7 @@ export default function CellBiologyPage() {
       title={content.title}
       subtitle={content.subtitle}
       chapters={content.chapters}
+      subtopic="cell-biology"
     />
   );
 }
