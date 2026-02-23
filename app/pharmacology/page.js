@@ -151,24 +151,37 @@ export default function PharmacologyPage() {
 
             <div>
               <div className="mb-4 flex items-center gap-4">
-                <h2 className="text-4xl font-semibold tracking-tight text-white">Learning Path</h2>
+                <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                  Learning Path
+                </h2>
                 <div className="h-px flex-1 bg-cyan-200/20" />
               </div>
-              <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-cyan-200/25 bg-white/10 p-3 backdrop-blur">
-                {["1 Basics", "2 Mechanisms", "3 Clinical Use", "4 Boards"].map((step, index) => (
-                  <div key={step} className="flex items-center">
-                    <span className="rounded-full border border-cyan-200/35 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100">
-                      {step}
-                    </span>
-                    {index < 3 ? <span className="px-2 text-cyan-200">{">"}</span> : null}
-                  </div>
-                ))}
+              <div className="rounded-2xl border border-cyan-200/25 bg-white/8 p-3 backdrop-blur">
+                <div className="flex flex-wrap items-center gap-2">
+                  {[
+                    { id: "01", label: "Basics" },
+                    { id: "02", label: "Mechanisms" },
+                    { id: "03", label: "Clinical Use" },
+                    { id: "04", label: "Boards" },
+                  ].map((step, index, arr) => (
+                    <div key={step.id} className="flex items-center gap-2">
+                      <span className="rounded-full border border-cyan-200/35 bg-gradient-to-r from-cyan-400/15 to-blue-500/15 px-4 py-2 text-sm font-semibold text-cyan-100">
+                        {step.id} {step.label}
+                      </span>
+                      {index < arr.length - 1 ? (
+                        <span className="text-lg font-semibold text-cyan-300/80">›</span>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             <div>
               <div className="mb-4 flex items-center gap-4">
-                <h2 className="text-4xl font-semibold tracking-tight text-white">Featured Content</h2>
+                <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                  Featured Content
+                </h2>
                 <div className="h-px flex-1 bg-cyan-200/20" />
               </div>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -176,10 +189,10 @@ export default function PharmacologyPage() {
                   <Link
                     key={item.title}
                     href={item.href}
-                    className="overflow-hidden rounded-2xl border border-cyan-200/25 bg-white/10 shadow-[0_12px_30px_-20px_rgba(56,189,248,0.7)] backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-cyan-200/45"
+                    className="group overflow-hidden rounded-2xl border border-cyan-200/25 bg-white/10 shadow-[0_12px_30px_-20px_rgba(56,189,248,0.7)] backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-cyan-200/45"
                   >
                     <div
-                      className={`h-28 bg-gradient-to-br ${
+                      className={`h-24 bg-gradient-to-br transition duration-200 group-hover:h-[6.5rem] ${
                         idx % 4 === 0
                           ? "from-emerald-300/25 via-sky-300/18 to-blue-300/25"
                           : idx % 4 === 1
@@ -190,8 +203,15 @@ export default function PharmacologyPage() {
                       }`}
                     />
                     <div className="p-4">
-                      <h3 className="text-3xl font-semibold leading-tight text-white">{item.title}</h3>
-                      <p className="mt-2 text-xl font-semibold text-cyan-200">Start {">"}</p>
+                      <h3 className="text-[2rem] font-semibold leading-tight text-white">
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-cyan-200/85">
+                        Curated Module
+                      </p>
+                      <p className="mt-3 inline-flex items-center gap-1 text-xl font-semibold text-cyan-200">
+                        Start <span className="transition group-hover:translate-x-0.5">›</span>
+                      </p>
                     </div>
                   </Link>
                 ))}

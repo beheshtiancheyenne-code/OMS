@@ -27,7 +27,7 @@ const details = {
     "Which adaptation pattern best explains this clinical scenario?",
   ],
   pearl:
-    "Anchor injury questions to ATP depletion, membrane damage, and DNA/protein response pathways.",
+    "ATP depletion, membrane damage, and DNA/protein response pathways.",
 };
 
 export default function GrowthAdaptationsStandalonePage() {
