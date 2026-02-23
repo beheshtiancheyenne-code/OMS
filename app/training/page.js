@@ -1,51 +1,145 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
-export default function TrainingPage() {
+const lectureCards = [
+  {
+    title: "Basic Sciences",
+    subtitle: "Fundamentals of Medical Science",
+    href: "/basic-sciences",
+    tone: "from-sky-500 via-blue-500 to-cyan-300",
+    buttonTone: "from-blue-700 to-sky-600",
+    keywords: "all popular new basic science fundamentals",
+    icon: "🧬",
+  },
+  {
+    title: "Anatomy & Radiology",
+    subtitle: "Anatomy, Imaging, and Diagnostics",
+    href: "/anatomy",
+    tone: "from-indigo-700 via-violet-600 to-purple-400",
+    buttonTone: "from-indigo-700 to-violet-600",
+    keywords: "all popular new anatomy radiology imaging diagnostics",
+    icon: "💀",
+  },
+  {
+    title: "Surgery & Anesthesiology",
+    subtitle: "Surgical Procedures and Anesthesia",
+    href: "/surgery",
+    tone: "from-cyan-600 via-teal-500 to-emerald-300",
+    buttonTone: "from-cyan-700 to-teal-600",
+    keywords: "all popular new surgery anesthesia procedures",
+    icon: "🩺",
+  },
+  {
+    title: "Pharmacology",
+    subtitle: "Medications and Therapeutics",
+    href: "/pharmacology",
+    tone: "from-red-500 via-orange-500 to-amber-300",
+    buttonTone: "from-orange-600 to-red-500",
+    keywords: "all popular new pharmacology medications therapeutics drugs",
+    icon: "💊",
+  },
+];
+
+const filters = ["All", "Popular", "New"];
+
+export default function Page() {
+  const [query, setQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filteredCards = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return lectureCards.filter((card) => {
+      const matchesQuery =
+        !q ||
+        `${card.title} ${card.subtitle} ${card.keywords}`
+          .toLowerCase()
+          .includes(q);
+      const matchesFilter =
+        activeFilter === "All" ||
+        card.keywords.toLowerCase().includes(activeFilter.toLowerCase());
+      return matchesQuery && matchesFilter;
+    });
+  }, [query, activeFilter]);
+
   return (
-    <main className="bg-gray-100 pb-16">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(88,28,135,0.5),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(59,130,246,0.35),transparent_40%),linear-gradient(120deg,#09052f_0%,#11084a_45%,#1a1f68_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.22)_1px,transparent_1px)] bg-[size:9px_9px] opacity-30" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent,rgba(59,130,246,0.25)_50%,transparent)] opacity-25" />
-
-        <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-6 py-24 text-white md:flex-row md:items-end md:justify-between">
-          <h1 className="text-5xl font-bold tracking-tight md:text-6xl">Lectures</h1>
-          <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200/90">
-            <Link href="/" className="hover:text-white">Home</Link>
-            <span className="mx-2 text-cyan-300">▸</span>
-            <span className="text-white">Lectures</span>
+    <main className="min-h-screen bg-[#f3f4f6]">
+      <section className="mx-auto max-w-6xl px-4 pb-16 pt-14">
+        <div className="text-center">
+          <h1 className="bg-gradient-to-r from-sky-500 via-blue-600 to-fuchsia-500 bg-clip-text text-5xl font-extrabold text-transparent md:text-7xl">
+            Lectures
+          </h1>
+          <p className="mx-auto mt-5 max-w-3xl text-xl text-slate-600">
+            Explore our lecture categories in maxillofacial surgery and medical education.
           </p>
         </div>
-      </section>
 
-      <section className="mx-auto -mt-6 max-w-7xl px-4">
-        <div className="rounded-2xl border border-gray-200 bg-gray-100 p-8 shadow-sm md:p-12">
-          <div className="grid gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-4xl font-semibold text-gray-900">Lectures</h2>
-              <p className="mt-5 max-w-xl text-xl leading-relaxed text-gray-700">
-                Find lectures in oral and maxillofacial surgery training, focusing on
-                foundational principles, anatomy, and surgical sciences.
-              </p>
+        <div className="mt-8 rounded-2xl border border-slate-300 bg-white px-4 py-3 shadow-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <span className="text-2xl text-slate-400">⌕</span>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search lectures..."
+                className="w-full bg-transparent text-lg text-slate-700 outline-none placeholder:text-slate-400"
+              />
             </div>
 
-            <div>
-              <h3 className="text-4xl font-semibold text-gray-900">Find by Topic</h3>
-              <div className="mt-6 space-y-4">
-                <input
-                  type="text"
-                  placeholder="Enter your Keyword"
-                  className="w-full rounded-lg border border-gray-300 bg-white px-5 py-4 text-xl text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-                <select className="w-full rounded-lg border border-gray-300 bg-white px-5 py-4 text-xl text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                  <option>— Select Tags —</option>
-                  <option>Basic Sciences</option>
-                  <option>Anatomy</option>
-                  <option>Surgical Sciences</option>
-                </select>
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {filters.map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setActiveFilter(filter)}
+                  className={`rounded-xl border px-5 py-2 text-sm font-semibold transition ${
+                    activeFilter === filter
+                      ? "border-slate-300 bg-slate-200 text-slate-900"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Filter
+              </button>
             </div>
           </div>
+        </div>
+
+        <div className="mt-9 grid gap-6 md:grid-cols-2">
+          {filteredCards.map((card) => (
+            <article
+              key={card.title}
+              className="overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm"
+            >
+              <div className={`relative bg-gradient-to-r ${card.tone} p-7`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(255,255,255,0.35),transparent_35%),radial-gradient(circle_at_20%_85%,rgba(255,255,255,0.22),transparent_40%)]" />
+                <div className="relative flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-4xl font-bold leading-tight text-white">{card.title}</h2>
+                    <p className="mt-3 text-xl text-white/90">{card.subtitle}</p>
+                  </div>
+                  <span className="text-6xl">{card.icon}</span>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <Link
+                  href={card.href}
+                  className={`inline-flex rounded-xl bg-gradient-to-r ${card.buttonTone} px-6 py-3 text-lg font-semibold text-white shadow-md transition hover:brightness-110`}
+                >
+                  View Topics
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </main>

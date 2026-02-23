@@ -8,7 +8,7 @@ const basePath =
   isGithubActions && repoName && !isUserOrOrgSite ? `/${repoName}` : "";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(isGithubActions ? { output: "export" as const } : {}),
   trailingSlash: true,
   images: {
     unoptimized: true,

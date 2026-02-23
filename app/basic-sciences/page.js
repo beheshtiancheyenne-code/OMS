@@ -101,7 +101,7 @@ export default function BasicSciencesPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(56,189,248,0.2),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.24),transparent_30%),linear-gradient(120deg,rgba(2,6,23,0.5),rgba(4,19,58,0.35))]" />
         <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.13)_1px,transparent_1px)] bg-[size:10px_10px] opacity-30" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-14 text-white">
+        <div className="relative mx-auto max-w-[1700px] px-6 pb-8 pt-14 text-white xl:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300/90">
             <Link href="/" className="hover:text-white">Home</Link>
             <span className="mx-2 text-cyan-300">▸</span>
@@ -153,13 +153,13 @@ export default function BasicSciencesPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pt-2">
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <section className="mx-auto max-w-[1700px] px-6 pt-3 xl:px-8">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {filteredCards.map((card) => (
             <Link
               key={card.title}
               href={card.href}
-              className="group relative overflow-hidden rounded-2xl border border-cyan-200/20 bg-[linear-gradient(150deg,rgba(16,30,76,0.82),rgba(8,20,58,0.92))] p-5 shadow-[0_15px_50px_-20px_rgba(8,145,178,0.8)] transition-all duration-200 hover:-translate-y-1 hover:border-cyan-200/40"
+              className="group relative min-h-[280px] overflow-hidden rounded-2xl border border-cyan-200/20 bg-[linear-gradient(150deg,rgba(16,30,76,0.82),rgba(8,20,58,0.92))] p-6 shadow-[0_15px_50px_-20px_rgba(8,145,178,0.8)] transition-all duration-200 hover:-translate-y-1 hover:border-cyan-200/40"
             >
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-20 transition group-hover:opacity-30"
@@ -173,11 +173,11 @@ export default function BasicSciencesPage() {
                   </span>
                   <span className="text-2xl text-cyan-200/80 transition group-hover:translate-x-1">›</span>
                 </div>
-                <h2 className="mt-4 text-3xl font-bold leading-tight text-white">{card.title}</h2>
-                <p className="mt-4 text-lg text-slate-200">
+                <h2 className="mt-5 text-[2rem] font-bold leading-tight text-white">{card.title}</h2>
+                <p className="mt-5 text-xl text-slate-200">
                   📘 {card.lessons} Lessons • {card.progress}% Complete
                 </p>
-                <div className="mt-3 h-2.5 rounded-full bg-slate-900/60">
+                <div className="mt-4 h-3 rounded-full bg-slate-900/60">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-400"
                     style={{ width: `${card.progress}%` }}

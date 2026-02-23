@@ -90,17 +90,13 @@ export default function Navbar() {
       if (isTypingTarget) return;
       if (e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k")) {
         e.preventDefault();
+        setQuery("");
         setSearchOpen(true);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
-
-  useEffect(() => {
-    if (!searchOpen) return;
-    setQuery("");
-  }, [searchOpen]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-gray-100">
@@ -130,23 +126,22 @@ export default function Navbar() {
           </Link>
 
           <Dropdown
-            label="About"
-            items={[
-              { name: "About", href: "/about" },
-              { name: "Contact Us", href: "/about#contact" },
-            ]}
-          />
-
-          <Dropdown
             label="Lectures"
             href="/training"
             items={[
               { name: "Basic Sciences", href: "/basic-sciences" },
               { name: "Anatomy and Radiology", href: "/anatomy" },
               { name: "Surgery and Anesthesiology", href: "/surgery" },
-              { name: "Pharmacology", href: "/basic-sciences" },
+              { name: "Pharmacology", href: "/pharmacology" },
             ]}
           />
+
+          <Link
+            href="/resources"
+            className="rounded-md px-4 py-2.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/70 hover:text-red-600"
+          >
+            Research Hub
+          </Link>
 
           <Dropdown
             label="Resources"
@@ -156,19 +151,11 @@ export default function Navbar() {
             ]}
           />
 
-          <Link
-            href="/resources"
-            className="rounded-md px-4 py-2.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/70 hover:text-red-600"
-          >
-            Research HUB
-          </Link>
-
           <Dropdown
-            label="News"
+            label="About"
             items={[
-              { name: "News", href: "/news" },
-              { name: "Job Opportunities", href: "/news#jobs" },
-              { name: "Events", href: "/news#events" },
+              { name: "About", href: "/about" },
+              { name: "Contact Us", href: "/about#contact" },
             ]}
           />
 
@@ -187,7 +174,10 @@ export default function Navbar() {
             className={`text-2xl transition-all duration-200 hover:scale-110 hover:text-black active:scale-95 ${
               searchOpen ? "animate-search-click-flash scale-110 text-red-600" : ""
             }`}
-            onClick={() => setSearchOpen(true)}
+            onClick={() => {
+              setQuery("");
+              setSearchOpen(true);
+            }}
             aria-label="Search"
           >
             🔍

@@ -122,7 +122,7 @@ export default function Home() {
                 Research HUB
               </Link>
               <Link
-                href="/basic-sciences"
+                href="/pharmacology"
                 className="rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50"
               >
                 Lectures - Pharmacology

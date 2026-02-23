@@ -1,0 +1,9 @@
+{
+  "markdown": "## AI Notes Test (Real Route)\n\nIf you see this on the Chronic Inflammation page, the pipeline works.\n\n- Macrophages + lymphocytes\n- Fibrosis + tissue remodeling\n\nExample citation: [PMID:123456]\n",
+  "references": [
+    {
+      "id": "PMID:123456",
+      "citation": "Example Author. Example Paper Title. Example Journal. 2020. PMID:123456."
+    }
+  ]
+}

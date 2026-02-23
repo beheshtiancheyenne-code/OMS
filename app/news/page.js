@@ -1,48 +1,48 @@
-import Link from "next/link";
-
-const newsItems = [
-  {
-    id: "events",
-    title: "Events",
-    text: "Upcoming workshops and webinars will be posted here.",
-  },
-  {
-    id: "jobs",
-    title: "Job Opportunities",
-    text: "Open positions and academic opportunities will be listed here.",
-  },
-  {
-    id: "updates",
-    title: "News of Interest",
-    text: "Latest updates from OMS Academy and related research.",
-  },
-];
-
-export default function NewsPage() {
+export default function Page() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-16">
-      <h1 className="text-4xl font-bold text-slate-900">News</h1>
-      <p className="mt-4 text-lg text-slate-700">
-        Latest announcements, events, and opportunities.
-      </p>
+    <main className="bg-slate-50">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+            News
+          </h1>
+          <p className="mt-4 max-w-3xl text-lg text-slate-700">
+            Latest updates for events, career opportunities, and specialty news.
+          </p>
+        </div>
+      </section>
 
-      <div className="mt-8 space-y-6">
-        {newsItems.map((item) => (
-          <section key={item.id} id={item.id} className="rounded-2xl border p-6">
-            <h2 className="text-2xl font-semibold text-slate-900">{item.title}</h2>
-            <p className="mt-2 text-slate-700">{item.text}</p>
-          </section>
-        ))}
-      </div>
+      <section id="events" className="mx-auto max-w-6xl px-4 py-10">
+        <h2 className="text-3xl font-semibold text-slate-900">Events</h2>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {[
+            "OMFS Education Symposium - March 15",
+            "Resident Case Review Webinar - April 2",
+          ].map((item) => (
+            <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="text-xl font-semibold text-slate-900">{item}</h3>
+              <p className="mt-2 text-slate-700">Registration details and agenda published soon.</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
-      <div className="mt-10">
-        <Link
-          href="/"
-          className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white"
-        >
-          Back to Home
-        </Link>
-      </div>
+      <section id="jobs" className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h2 className="text-3xl font-semibold text-slate-900">Job Opportunities</h2>
+          <div className="mt-4 space-y-3">
+            {[
+              "Clinical Educator - Maxillofacial Surgery",
+              "Research Associate - Surgical Outcomes",
+              "Curriculum Coordinator - Digital Learning",
+            ].map((item) => (
+              <div key={item} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-lg font-semibold text-slate-900">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
