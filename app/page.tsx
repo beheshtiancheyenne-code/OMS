@@ -85,7 +85,7 @@ export default function Home() {
             <div className="justify-self-end">
               <div className="overflow-hidden rounded-sm border border-slate-200 bg-slate-100 shadow-sm">
                 <img
-                  src={`${basePath}/homepage.png`}
+                  src={`${basePath}/homepage.png?v=1`}
                   alt="OMS visual"
                   className="h-[360px] w-[520px] max-w-full object-cover"
                 />
