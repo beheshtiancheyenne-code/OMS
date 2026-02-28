@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type NewsItem = {
   category: string;
@@ -16,6 +16,14 @@ type HubCard = {
   progress: number;
   href: string;
   image: string;
+};
+
+type FeaturePanel = {
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  keywords: string;
 };
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -92,8 +100,82 @@ const newsItems: NewsItem[] = [
   { category: "News of Interest", title: "New Report: Coming Soon!", href: "/news" },
 ];
 
+const featurePanels: FeaturePanel[] = [
+  {
+    title: "Clinical Lectures",
+    description: "Latest: Maxillofacial Trauma Management",
+    href: "/basic-sciences",
+    cta: "[Browse All Modules]",
+    keywords: "lectures trauma maxillofacial",
+  },
+  {
+    title: "Research & Trials",
+    description: "New Upload: Bone Grafting Meta-Analysis",
+    href: "/resources",
+    cta: "[Access Library]",
+    keywords: "research trials library bone grafting",
+  },
+  {
+    title: "Peer Discussion",
+    description: "Active: Management of Third Molar Complications",
+    href: "/community",
+    cta: "[Join Conversation]",
+    keywords: "community peer discussion third molar",
+  },
+];
+
+function normalizeSearchText(value: string) {
+  return value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function includesAllTokens(content: string, tokens: string[]) {
+  const normalizedContent = normalizeSearchText(content);
+  return tokens.every((token) => normalizedContent.includes(token));
+}
+
 export default function Home() {
   const [heroImageSrc, setHeroImageSrc] = useState(`${basePath}/homepage.png`);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const queryTokens = useMemo(
+    () => normalizeSearchText(searchQuery).split(" ").filter(Boolean),
+    [searchQuery]
+  );
+
+  const filteredFeaturePanels = useMemo(() => {
+    if (!queryTokens.length) return featurePanels;
+    return featurePanels.filter((item) =>
+      includesAllTokens(`${item.title} ${item.description} ${item.keywords}`, queryTokens)
+    );
+  }, [queryTokens]);
+
+  const filteredHubCards = useMemo(() => {
+    if (!queryTokens.length) return hubCards;
+    return hubCards.filter((card) =>
+      includesAllTokens(`${card.title} ${card.level} ${card.lessons} lessons`, queryTokens)
+    );
+  }, [queryTokens]);
+
+  const filteredNewsItems = useMemo(() => {
+    if (!queryTokens.length) return newsItems;
+    return newsItems.filter((item) =>
+      includesAllTokens(`${item.category} ${item.title}`, queryTokens)
+    );
+  }, [queryTokens]);
+
+  const hasNoMatches =
+    queryTokens.length > 0 &&
+    filteredFeaturePanels.length === 0 &&
+    filteredHubCards.length === 0 &&
+    filteredNewsItems.length === 0;
+
+  const totalLessons = filteredHubCards.reduce((sum, card) => sum + card.lessons, 0);
+  const averageProgress = filteredHubCards.length
+    ? Math.round(
+        filteredHubCards.reduce((sum, card) => sum + card.progress, 0) /
+          filteredHubCards.length
+      )
+    : 0;
 
   return (
     <main>
@@ -132,30 +214,43 @@ export default function Home() {
 
           <div className="mt-10 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
             <div className="border-b border-slate-200 p-3">
-              <div className="rounded-lg border border-slate-300 px-4 py-2 text-slate-500">Search</div>
+              <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-50 px-4 py-2">
+                <span className="text-slate-400">🔎</span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search lectures, resources, discussions, and news..."
+                  className="w-full bg-transparent text-slate-700 outline-none placeholder:text-slate-400"
+                />
+              </div>
+              {hasNoMatches && (
+                <p className="mt-2 px-1 text-sm text-slate-500">
+                  No matching content found. Try a different keyword.
+                </p>
+              )}
             </div>
             <div className="grid md:grid-cols-3">
-              <div className="border-b border-slate-200 p-6 md:border-b-0 md:border-r">
-                <h3 className="text-4xl font-medium text-slate-900">Clinical Lectures</h3>
-                <p className="mt-3 text-2xl text-slate-700">Latest: Maxillofacial Trauma Management</p>
-                <Link href="/basic-sciences" className="mt-6 inline-block text-2xl text-slate-800 hover:text-slate-950">
-                  [Browse All Modules]
-                </Link>
-              </div>
-              <div className="border-b border-slate-200 p-6 md:border-b-0 md:border-r">
-                <h3 className="text-4xl font-medium text-slate-900">Research &amp; Trials</h3>
-                <p className="mt-3 text-2xl text-slate-700">New Upload: Bone Grafting Meta-Analysis</p>
-                <Link href="/resources" className="mt-6 inline-block text-2xl text-slate-800 hover:text-slate-950">
-                  [Access Library]
-                </Link>
-              </div>
-              <div className="p-6">
-                <h3 className="text-4xl font-medium text-slate-900">Peer Discussion</h3>
-                <p className="mt-3 text-2xl text-slate-700">Active: Management of Third Molar Complications</p>
-                <Link href="/community" className="mt-6 inline-block text-2xl text-slate-800 hover:text-slate-950">
-                  [Join Conversation]
-                </Link>
-              </div>
+              {filteredFeaturePanels.map((panel) => (
+                <div
+                  key={panel.title}
+                  className="border-b border-slate-200 p-6 md:border-b-0 md:border-r md:last:border-r-0"
+                >
+                  <h3 className="text-4xl font-medium text-slate-900">{panel.title}</h3>
+                  <p className="mt-3 text-2xl text-slate-700">{panel.description}</p>
+                  <Link
+                    href={panel.href}
+                    className="mt-6 inline-block text-2xl text-slate-800 hover:text-slate-950"
+                  >
+                    {panel.cta}
+                  </Link>
+                </div>
+              ))}
+              {filteredFeaturePanels.length === 0 && (
+                <p className="p-6 text-lg text-slate-600 md:col-span-3">
+                  No featured sections match this search.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -198,7 +293,7 @@ export default function Home() {
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {hubCards.map((card) => (
+            {filteredHubCards.map((card) => (
               <Link
                 key={card.title}
                 href={card.href}
@@ -239,25 +334,33 @@ export default function Home() {
                 </div>
               </Link>
             ))}
+            {filteredHubCards.length === 0 && (
+              <p className="rounded-xl border border-cyan-200/30 bg-white/10 p-5 text-lg text-cyan-100 md:col-span-2 xl:col-span-4">
+                No Basic Sciences modules match your search.
+              </p>
+            )}
           </div>
 
           <div className="mt-8 rounded-2xl border border-cyan-200/25 bg-white/10 px-4 py-4 backdrop-blur md:px-8">
             <div className="grid gap-4 text-center text-cyan-100 md:grid-cols-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Units Completed</p>
-                <p className="mt-1 text-4xl font-semibold">7</p>
+                <p className="mt-1 text-4xl font-semibold">{filteredHubCards.length}</p>
               </div>
               <div className="md:border-x md:border-cyan-200/25">
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Total Lessons</p>
-                <p className="mt-1 text-4xl font-semibold">67+</p>
+                <p className="mt-1 text-4xl font-semibold">{totalLessons}+</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Overall Progress</p>
-                <p className="mt-1 text-4xl font-semibold">61%</p>
+                <p className="mt-1 text-4xl font-semibold">{averageProgress}%</p>
               </div>
             </div>
             <div className="mt-4 h-3 overflow-hidden rounded-full bg-blue-950/80">
-              <div className="h-full w-[61%] rounded-full bg-gradient-to-r from-cyan-400 to-lime-300" />
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-lime-300"
+                style={{ width: `${averageProgress}%` }}
+              />
             </div>
           </div>
         </div>
@@ -281,7 +384,7 @@ export default function Home() {
           </div>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {newsItems.map((n) => (
+            {filteredNewsItems.map((n) => (
               <Link
                 key={n.title}
                 href={n.href}
@@ -292,6 +395,11 @@ export default function Home() {
                 <p className="mt-3 text-lg font-medium text-slate-600">Learn more →</p>
               </Link>
             ))}
+            {filteredNewsItems.length === 0 && (
+              <p className="rounded-2xl border border-slate-200/70 bg-white/90 p-6 text-lg text-slate-700 md:col-span-3">
+                No news items match your search.
+              </p>
+            )}
           </div>
 
           <div className="mt-14 flex items-end justify-between gap-4">

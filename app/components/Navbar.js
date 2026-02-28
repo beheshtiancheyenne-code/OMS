@@ -3,21 +3,77 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { getSession, logout } from "@/app/lib/clientAuth";
+import { slugifySegment, subtopicContent } from "@/app/basic-sciences/components/subtopicData";
 
-const searchItems = [
-  { name: "Home", href: "/", tags: ["home"] },
+const staticSearchItems = [
+  { name: "Home", href: "/", tags: ["home", "omfs", "nexus"] },
   { name: "About", href: "/about", tags: ["about", "contact"] },
-  { name: "Community", href: "/community", tags: ["community"] },
-  { name: "Lectures - Basic Sciences", href: "/basic-sciences", tags: ["lectures", "basic sciences"] },
-  { name: "Lectures - Anatomy and Radiology", href: "/anatomy", tags: ["lectures", "anatomy", "radiology"] },
-  { name: "Lectures - Surgery and Anesthesiology", href: "/surgery", tags: ["lectures", "surgery", "anesthesiology"] },
-  { name: "Lectures - Pharmacology", href: "/pharmacology", tags: ["lectures", "pharmacology"] },
+  { name: "Community", href: "/community", tags: ["community", "discussion", "forum"] },
+  { name: "Lectures", href: "/training", tags: ["lectures", "training", "webinars"] },
+  { name: "Basic Sciences", href: "/basic-sciences", tags: ["lectures", "basic sciences"] },
+  { name: "Anatomy and Radiology", href: "/anatomy", tags: ["lectures", "anatomy", "radiology", "imaging"] },
+  { name: "Surgery and Anesthesiology", href: "/surgery", tags: ["lectures", "surgery", "anesthesiology"] },
+  { name: "Pharmacology", href: "/pharmacology", tags: ["lectures", "pharmacology", "drugs"] },
+  { name: "Research Hub", href: "/resources", tags: ["resources", "research", "hub"] },
   { name: "Resources - Digital Toolbox", href: "/resources#toolbox", tags: ["resources", "toolbox"] },
-  { name: "Resources - IRB Resources", href: "/resources#irb", tags: ["resources", "irb"] },
-  { name: "News", href: "/news", tags: ["news"] },
-  { name: "News - Job Opportunities", href: "/news#jobs", tags: ["news", "jobs"] },
+  { name: "Resources - IRB Resources", href: "/resources#irb", tags: ["resources", "irb", "ethics"] },
+  { name: "News", href: "/news", tags: ["news", "updates"] },
+  { name: "News - Job Opportunities", href: "/news#jobs", tags: ["news", "jobs", "careers"] },
   { name: "News - Events", href: "/news#events", tags: ["news", "events"] },
+  { name: "Login", href: "/login", tags: ["auth", "signin", "login"] },
+  { name: "Sign Up", href: "/signup", tags: ["auth", "register", "create account"] },
+  { name: "Account", href: "/account", tags: ["profile", "dashboard", "account"] },
 ];
+
+const chapterSearchItems = Object.entries(subtopicContent).flatMap(([subtopicSlug, section]) => {
+  const sectionItem = {
+    name: `Basic Sciences - ${section.title}`,
+    href: `/basic-sciences/${subtopicSlug}`,
+    tags: ["basic sciences", section.title, section.subtitle],
+  };
+  const chapterItems = section.chapters.map((chapter) => ({
+    name: `${section.title}: ${chapter.title}`,
+    href: `/basic-sciences/${subtopicSlug}/${slugifySegment(chapter.title)}`,
+    tags: [
+      "basic sciences",
+      section.title,
+      chapter.title,
+      chapter.desc,
+      "chapter",
+    ],
+  }));
+  return [sectionItem, ...chapterItems];
+});
+
+const searchItems = [...staticSearchItems, ...chapterSearchItems];
+
+function normalizeSearch(value = "") {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function scoreItem(item, normalizedQuery, tokens) {
+  const normalizedName = normalizeSearch(item.name);
+  const normalizedTags = normalizeSearch(item.tags.join(" "));
+  let score = 0;
+
+  if (normalizedName === normalizedQuery) score += 100;
+  if (normalizedName.startsWith(normalizedQuery)) score += 50;
+  if (normalizedName.includes(normalizedQuery)) score += 35;
+  if (normalizedTags.includes(normalizedQuery)) score += 20;
+  score += tokens.reduce((sum, token) => {
+    if (normalizedName.startsWith(token)) return sum + 5;
+    if (normalizedName.includes(token)) return sum + 3;
+    if (normalizedTags.includes(token)) return sum + 1;
+    return sum;
+  }, 0);
+
+  return score;
+}
 
 function Dropdown({ label, items, href }) {
   const [open, setOpen] = useState(false);
@@ -71,12 +127,17 @@ export default function Navbar() {
   const hasQuery = query.trim().length > 0;
 
   const filteredItems = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return searchItems.filter((item) => {
-      const haystack = `${item.name} ${item.tags.join(" ")}`.toLowerCase();
-      return haystack.includes(q);
-    });
+    const normalizedQuery = normalizeSearch(query);
+    const tokens = normalizedQuery.split(" ").filter(Boolean);
+    if (!tokens.length) return [];
+
+    return searchItems
+      .filter((item) => {
+        const haystack = normalizeSearch(`${item.name} ${item.tags.join(" ")}`);
+        return tokens.every((token) => haystack.includes(token));
+      })
+      .sort((a, b) => scoreItem(b, normalizedQuery, tokens) - scoreItem(a, normalizedQuery, tokens))
+      .slice(0, 40);
   }, [query]);
 
   useEffect(() => {
@@ -102,28 +163,17 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    async function loadSession() {
-      try {
-        const res = await fetch("/api/auth/session", { cache: "no-store" });
-        const data = await res.json();
-        if (active) {
-          setAuthUser(data.user || null);
-        }
-      } catch {
-        if (active) setAuthUser(null);
-      } finally {
-        if (active) setAuthLoading(false);
-      }
+    function syncSession() {
+      setAuthUser(getSession());
+      setAuthLoading(false);
     }
-    loadSession();
-    return () => {
-      active = false;
-    };
+    syncSession();
+    window.addEventListener("storage", syncSession);
+    return () => window.removeEventListener("storage", syncSession);
   }, [pathname]);
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    logout();
     setAuthUser(null);
     router.push("/");
     router.refresh();
@@ -294,7 +344,7 @@ export default function Navbar() {
               )}
               {hasQuery && filteredItems.map((item) => (
                 <Link
-                  key={item.href}
+                  key={`${item.href}-${item.name}`}
                   href={item.href}
                   onClick={() => setSearchOpen(false)}
                   className="block rounded-lg px-3 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
